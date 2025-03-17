@@ -34,6 +34,9 @@ pub mod examples;
 mod http;
 pub mod settings;
 
+pub mod env;
+
+
 // #[panic_handler]
 // fn panic(_panic: &core::panic::PanicInfo<'_>) -> ! {
 //     core::intrinsics::abort()
@@ -332,20 +335,27 @@ fn origin_main(_argc: usize, argv: *mut *mut u8, envp: *mut *mut u8) -> i32 {
         "HACKATHON_TELEMETRY_PIPE",
         format!("/proc/self/fd/{}", pipe.writer.as_raw_fd()),
     );
-    env.insert("debian_chroot", "hackathon");
+    // env.insert("debian_chroot", "hackathon");
 
     ARGV.store(argv, core::sync::atomic::Ordering::SeqCst);
     let argv = unsafe { Argv::from_raw(argv) };
 
     let path = CString::new("/proc/self/exe").unwrap();
+    
+    let env_file = CString::new("/opt/_auto_dd/.new_env").unwrap();
+
+    if env::file_exists(&env_file) {
+        env::load_env_from_file(&mut env, &env_file).unwrap();
+    }
 
     let child_env = ChildEnv { env, argv, path, fds_to_drop_in_parent: vec![] };
 
-    new_env_loop(&child_env);
-    let l = new_remote_env_loop(&child_env);
+    // FOR this POC disable the fancy remote env loop
+    // new_env_loop(&child_env);
+    // let l = new_remote_env_loop(&child_env);
     child_thread(child_env);
 
-    l.join();
+    // l.join();
     drop(pipe);
     rustix::runtime::exit_group(0);
 }

@@ -1,0 +1,10 @@
+#!/bin/sh
+export CORECLR_ENABLE_PROFILING=1
+export CORECLR_PROFILER_PATH=/opt/_auto_dd/package/Datadog.Trace.ClrProfiler.Native.so
+export CORECLR_PROFILER={846F5F1C-F9AE-4B07-969E-05C26BC060D8}
+export DD_DOTNET_TRACER_HOME=/opt/_auto_dd/package
+
+# Start tail -f /logs in the background
+tail -f /var/log/datadog/dotnet/dotnet-native-loader-dotnet-7.log &
+
+exec "$@"
